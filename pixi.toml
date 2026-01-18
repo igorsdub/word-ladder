@@ -1,0 +1,19 @@
+[project]
+name = "word-ladder"
+description = "The Word Ladder game exploration via the graph theory."
+version = "0.1.0"
+channels = ['conda-forge']
+platforms = ['osx-64', 'osx-arm64']
+
+[dependencies]
+python = "~=3.10.0"
+loguru = "*"
+pytest = "*"
+ruff = "*"
+tqdm = "*"
+typer = "*"
+pip = "*"
+
+[pypi-dependencies]
+python-dotenv = "*"
+src = { path = ".", editable = true }
