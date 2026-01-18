@@ -1,4 +1,4 @@
-[project]
+[workspace]
 name = "word-ladder"
 description = "The Word Ladder game exploration via the graph theory."
 version = "0.1.0"
