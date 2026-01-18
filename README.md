@@ -59,3 +59,12 @@ An exoloartion of the word ladder game thorugh the graph theory. This game is a 
 
 --------
 
+# References
+
+- [Word Ladder Algorithm](https://bradfieldcs.com/algos/graphs/word-ladder/) by Bradfield CS
+- [Laddergrams](https://blogs.mathworks.com/community/2023/01/25/laddergrams/) by Ned Gulley
+- [Word Ladder](https://en.wikipedia.org/wiki/Word_ladder) on Wikipedia
+- [Word Ladder Analysis](https://www.garrettsidle.com/Blog?id=word-ladder-analysis) at Garrett Sidle blog
+- [New Word Ladder Game Bot with Scoring Based on Graphs](https://community.wolfram.com/groups/-/m/t/908570) by Irina Tirosyan
+- [Generating Word Ladders Using Adjacency Matrices](https://community.wolfram.com/groups/-/m/t/2928331) by Chase Marangu
+- [Word Ladders with Julia](https://numbersandshapes.net/posts/word_ladders_with_julia/) at Numbers and Shapes blog 
