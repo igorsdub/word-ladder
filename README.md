@@ -8,7 +8,7 @@ An exoloartion of the word ladder game thorugh the graph theory. This game is a 
 
 ## Project Organization
 
-```
+```tree
 ├── LICENSE            <- Open-source license if one is chosen
 ├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
 ├── README.md          <- The top-level README for developers using this project.
@@ -105,6 +105,18 @@ aba
 abb
 abu
 ```
+
+### Graph
+
+Next, we will create a graph where each node represents a word, and an edge connects two nodes if the corresponding words differ by exactly one letter. We will use the NetworkX library to construct and analyze the graph.
+
+To build the graph, run the following command:
+
+```bash
+python src/features.py build-graph --word-length 3
+```
+
+This command uses the English alphabet (a-z) to find all possible one-letter transformations for each word in the filtered dataset. The resulting graph is saved in the `data/interim` directory in `.pickle` format.
 
 ## References
 
