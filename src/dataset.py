@@ -28,7 +28,8 @@ def download(
 @app.command()
 def filter(
     input_path: Path = RAW_DATA_DIR / "corpora" / "words" / "en",
-    n_letters: int = 3,
+    word_length: int = 3,
+    proper_nouns: bool = False,
     output_dir: Path = INTERIM_DATA_DIR,
 ):
     """Filter the NLTK corpora English n-letter lowercase words.
@@ -38,14 +39,18 @@ def filter(
         words = f.read().splitlines()   
     logger.success("Loading dataset complete.")
 
-    logger.info(f"Filtering {n_letters}-letter lowercase words...")
-    # Select only lowercase words
-    filtered_words = [word for word in words if (len(word) == n_letters) and word.islower()]
+    if not proper_nouns:
+        logger.info("Remove proper nouns...")
+        words =  [word for word in words if word.islower()]
+        logger.success("Removal complete.")
+
+    logger.info(f"Filtering {word_length}-letter lowercase words...")
+    filtered_words = [word for word in words if len(word) == word_length]
     logger.success("Filtering complete.")
 
-    logger.info(f"Saving filtered words to {output_dir / f'en_words_letters_0{n_letters}.txt'}...")
+    logger.info(f"Saving filtered words to {output_dir / f'en_words_len_0{word_length}.txt'}...")
     output_dir.mkdir(parents=True, exist_ok=True)
-    with open(output_dir / f"en_words_letters_0{n_letters}.txt", "w") as f:
+    with open(output_dir / f"en_words_len_0{word_length}.txt", "w") as f:
         for word in filtered_words:
             f.write(f"{word}\n")
     logger.success("Saving complete.")
