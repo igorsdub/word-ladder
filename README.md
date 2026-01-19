@@ -118,6 +118,12 @@ python src/features.py build-graph --word-length 3
 
 This command uses the English alphabet (a-z) to find all possible one-letter transformations for each word in the filtered dataset. The resulting graph is saved in the `data/interim` directory in `.pickle` format.
 
+Next, we assign `isValidWord` attribute to each node in the graph. A valid word is defined as a word that exists in the original dataset. The, we conncet nodes with `isValidWord=True` if they differ by one letter.
+
+```bash
+python src/features.py assign-valid-words --word-length 3
+```
+
 ## References
 
 - [Word Ladder Algorithm](https://bradfieldcs.com/algos/graphs/word-ladder/) by Bradfield CS
