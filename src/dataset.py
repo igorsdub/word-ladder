@@ -50,7 +50,7 @@ def filter(
 
     logger.info(f"Saving filtered words to {output_dir / f'en_words_len_0{word_length}.txt'}...")
     output_dir.mkdir(parents=True, exist_ok=True)
-    with open(output_dir / f"en_words_len_0{word_length}.txt", "w") as f:
+    with open(output_dir / f"en_len0{word_length}.txt", "w") as f:
         for word in filtered_words:
             f.write(f"{word}\n")
     logger.success("Saving complete.")

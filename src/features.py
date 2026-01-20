@@ -35,7 +35,7 @@ def save_graph(
 
 
 def load_graph(
-    input_path: Path = INTERIM_DATA_DIR / "graph_en_len_03.pkl",
+    input_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
 ):
     """
     Load a graph from a pickle file.
@@ -50,7 +50,7 @@ def load_graph(
 
 @app.command()
 def build_graph(
-    output_path: Path = INTERIM_DATA_DIR / "graph_en_len_03.pkl",
+    output_path: Path = INTERIM_DATA_DIR / "graph_en_len03_empty.pkl",
     word_length: int = 3,
     alphabet: str = "abcdefghijklmnopqrstuvwxyz",
     connect: bool = False,
@@ -91,9 +91,9 @@ def build_graph(
 
 @app.command()
 def assign_words(
-    graph_input_path: Path = INTERIM_DATA_DIR / "graph_en_len_03.pkl",
-    words_input_path: Path = INTERIM_DATA_DIR / "en_words_len_03.txt",
-    output_path: Path = INTERIM_DATA_DIR / "graph_en_len_03_valid.pkl",
+    graph_input_path: Path = INTERIM_DATA_DIR / "graph_en_len03_empty.pkl",
+    words_input_path: Path = INTERIM_DATA_DIR / "en_len03.txt",
+    output_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
 ):
     """
     Assign valid words to the nodes of the word graph.
