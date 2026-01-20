@@ -1,7 +1,12 @@
 from pathlib import Path
 
 from bokeh.io import save
-from bokeh.models import BasicTicker, ColorBar, LinearColorMapper
+from bokeh.models import (
+    BasicTicker,
+    ColorBar,
+    LinearColorMapper,
+    NodesAndAdjacentNodes,
+)
 from bokeh.palettes import Viridis256
 from bokeh.plotting import figure, from_networkx
 from loguru import logger
@@ -126,7 +131,7 @@ def graph_bokeh(
         width=800,
         height=800,
         sizing_mode="stretch_both",
-        tools="hover,pan,wheel_zoom,box_zoom,reset",
+        tools="hover,pan,wheel_zoom,box_zoom,box_select,tap,reset",
         tooltips=[("word", "@word"), ("degree", "@degree")],
         background_fill_color=None,
         border_fill_color=None,
@@ -157,7 +162,27 @@ def graph_bokeh(
         fill_color={"field": "degree", "transform": color_mapper},
     )
     graph.edge_renderer.glyph.update(line_color="#888888", line_alpha=0.1)
+    # Create selection and hover glyphs for nodes
+    node_glyph = graph.node_renderer.glyph
+    graph.node_renderer.selection_glyph = node_glyph.clone(
+        fill_color="#FF6B6B", fill_alpha=1.0, size=12
+    )
+    graph.node_renderer.hover_glyph = node_glyph.clone(
+        fill_color="#FFC93C", fill_alpha=1.0, size=10
+    )
 
+    # Create selection and hover glyphs for edges
+    edge_glyph = graph.edge_renderer.glyph
+    graph.edge_renderer.selection_glyph = edge_glyph.clone(
+        line_color="#4A90E2", line_alpha=0.8, line_width=2
+    )
+    graph.edge_renderer.hover_glyph = edge_glyph.clone(
+        line_color="#FFC93C", line_alpha=0.8, line_width=1.5
+    )
+
+    # Set interaction policies
+    # Selection highlights node and adjacent nodes
+    graph.selection_policy = NodesAndAdjacentNodes()
     # Add color bar
     color_bar = ColorBar(
         color_mapper=color_mapper,
