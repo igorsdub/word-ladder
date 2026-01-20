@@ -5,7 +5,7 @@ from bokeh.models import (
     BasicTicker,
     ColorBar,
     LinearColorMapper,
-    NodesAndAdjacentNodes,
+    NodesAndLinkedEdges,
 )
 from bokeh.palettes import Viridis256
 from bokeh.plotting import figure, from_networkx
@@ -181,8 +181,8 @@ def graph_bokeh(
     )
 
     # Set interaction policies
-    # Selection highlights node and adjacent nodes
-    graph.selection_policy = NodesAndAdjacentNodes()
+    # Selection highlights node and linked edges
+    graph.selection_policy = NodesAndLinkedEdges()
     # Add color bar
     color_bar = ColorBar(
         color_mapper=color_mapper,
