@@ -33,7 +33,7 @@ def plot_graph(
 
     logger.info("Selecting valid word nodes...")
     valid_nodes = [n for n, attr in G.nodes(data=True) if attr.get("is_valid_word")]
-    G = G.subgraph(valid_nodes).copy()
+    G = G.subgraph(valid_nodes)
     logger.success(
         f"Filtered graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
     )
@@ -78,17 +78,20 @@ def plot_graph(
         hoverinfo="text",
         marker=dict(
             showscale=True,
-            # colorscale options
-            #'Greys' | 'YlGnBu' | 'Greens' | 'YlOrRd' | 'Bluered' | 'RdBu' |
-            #'Reds' | 'Blues' | 'Picnic' | 'Rainbow' | 'Portland' | 'Jet' |
-            #'Hot' | 'Blackbody' | 'Earth' | 'Electric' | 'Viridis' |
             colorscale="Viridis",
             reversescale=True,
             color=[],
-            size=10,
+            size=16,
             colorbar=dict(
-                thickness=15,
-                title=dict(text="Degree", side="right"),
+                thickness=20,
+                lenmode="pixels",
+                len=400,
+                title=dict(
+                    text="Degree",
+                    side="top",
+                    font=dict(size=20),
+                ),
+                tickfont=dict(size=16),
                 xanchor="left",
             ),
             line_width=0.5,
@@ -101,8 +104,9 @@ def plot_graph(
     node_adjacencies = []
     node_text = []
     for node_idx, adjacencies in enumerate(G.adjacency()):
-        node_adjacencies.append(len(adjacencies[1]))
-        node_text.append(node_names[node_idx])
+        degree = len(adjacencies[1])
+        node_adjacencies.append(degree)
+        node_text.append(f"word: {node_names[node_idx]}<br>degree: {degree}")
 
     node_trace.marker.color = node_adjacencies
     node_trace.text = node_text
@@ -111,7 +115,7 @@ def plot_graph(
     fig = go.Figure(
         data=[edge_trace, node_trace],
         layout=go.Layout(
-            title=dict(text=plot_title, font=dict(size=16)),
+            title=dict(text=plot_title, font=dict(size=24)),
             showlegend=False,
             hovermode="closest",
             # margin=dict(b=20, l=5, r=5, t=40),
@@ -124,16 +128,28 @@ def plot_graph(
             ],
             xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
             yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-            width=800,
-            height=800,
+            # width=500,
+            # height=500,
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
         ),
     )
 
+    config = {
+        "responsive": True,
+        "scrollZoom": True,
+        "modeBarButtonsToAdd": [
+            "drawline",
+            "drawopenpath",
+            "drawcircle",
+            "drawrect",
+            "eraseshape",
+        ],
+    }
+
     logger.info(f"Saving figure to {output_path}...")
     if output_path.suffix.lower() == ".html":
-        fig.write_html(output_path)
+        fig.write_html(output_path, config=config)
     else:
         fig.write_image(output_path)
 
