@@ -49,7 +49,7 @@ def load_graph(
 
 
 @app.command()
-def build_graph(
+def build(
     input_path: Path = INTERIM_DATA_DIR / "en_len03.txt",
     output_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
     word_length: int = 3,
