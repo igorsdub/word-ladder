@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from bokeh.io import save
+from bokeh.models import BasicTicker, ColorBar, LinearColorMapper
 from bokeh.palettes import Viridis256
 from bokeh.plotting import figure, from_networkx
 from loguru import logger
@@ -124,6 +125,7 @@ def graph_bokeh(
         y_axis_location=None,
         width=800,
         height=800,
+        sizing_mode="stretch_both",
         tools="hover,pan,wheel_zoom,box_zoom,reset",
         tooltips=[("word", "@word"), ("degree", "@degree")],
         background_fill_color=None,
@@ -139,24 +141,33 @@ def graph_bokeh(
     node_degrees = dict(G.degree())
     degrees = [node_degrees[node] for node in G.nodes()]
 
-    # Map degrees to colors
+    # Map degrees to colors using reversed Viridis
     min_degree = min(degrees)
     max_degree = max(degrees)
-    node_colors = []
-    for degree in degrees:
-        if max_degree > min_degree:
-            normalized = (degree - min_degree) / (max_degree - min_degree)
-            color_idx = int((1 - normalized) * 255)
-        else:
-            color_idx = 127
-        node_colors.append(Viridis256[color_idx])
+    palette_r = list(reversed(Viridis256))
+    color_mapper = LinearColorMapper(palette=palette_r, low=min_degree, high=max_degree)
 
     graph.node_renderer.data_source.data["word"] = list(G.nodes())
     graph.node_renderer.data_source.data["degree"] = degrees
-    graph.node_renderer.data_source.data["colors"] = node_colors
 
-    graph.node_renderer.glyph.update(size=8, fill_color="colors", fill_alpha=0.9)
+    graph.node_renderer.glyph.update(
+        size=8,
+        fill_alpha=0.9,
+        fill_color={"field": "degree", "transform": color_mapper},
+    )
     graph.edge_renderer.glyph.update(line_color="#888888", line_alpha=0.1)
+
+    # Add color bar
+    color_bar = ColorBar(
+        color_mapper=color_mapper,
+        ticker=BasicTicker(desired_num_ticks=8),
+        width=200,
+        height=20,
+        location=(0, 0),
+        title="Degree",
+        title_text_align="center",
+    )
+    p.add_layout(color_bar, "below")
 
     logger.info(f"Saving figure to {output_path}...")
     save(p, filename=str(output_path), title=plot_title)
