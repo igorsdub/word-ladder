@@ -1,5 +1,8 @@
 from pathlib import Path
 
+from bokeh.io import save
+from bokeh.palettes import Viridis256
+from bokeh.plotting import figure, from_networkx
 from loguru import logger
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -16,16 +19,16 @@ app = typer.Typer()
 
 @app.command()
 def graph_networkx(
-    input_path: Path = INTERIM_DATA_DIR / "graph_en_len_03_valid.pkl",
-    output_path: Path = FIGURES_DIR / "graph_en_len_03_networkx.png",
+    input_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
+    output_path: Path = FIGURES_DIR / "graph_en_len03_networkx.png",
     plot_title: str = "3-letter English word graph",
 ):
     """
-    Plot graph using NetworkX.draw.
+    Plot a graph using NetworkX.draw.
 
     Args:
-        input_path (Path, optional): _description_. Defaults to INTERIM_DATA_DIR/"graph_en_len_03_valid.pkl".
-        output_path (Path, optional): _description_. Defaults to FIGURES_DIR/"graph_en_len_03_valid.png".
+        input_path (Path, optional): _description_. Defaults to INTERIM_DATA_DIR/"graph_en_len03.pkl".
+        output_path (Path, optional): _description_. Defaults to FIGURES_DIR/"graph_en_len03.png".
         plot_title (str, optional): _description_. Defaults to "Word graph for 3-letter English words".
     """
     logger.info("Loading graph...")
@@ -83,17 +86,96 @@ def graph_networkx(
 
 
 @app.command()
+def graph_bokeh(
+    input_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
+    output_path: Path = FIGURES_DIR / "graph_en_len03_bokeh.html",
+    plot_title: str = "3-letter English word graph",
+):
+    """
+    Plot a graph using Bokeh.
+
+    Args:
+        input_path (Path, optional): _description_. Defaults to INTERIM_DATA_DIR/"graph_en_len03.pkl".
+        output_path (Path, optional): _description_. Defaults to FIGURES_DIR/"graph_en_len03_bokeh.html".
+        plot_title (str, optional): _description_. Defaults to "3-letter English word graph".
+    """
+    logger.info("Loading graph...")
+    G = load_graph(input_path)
+    logger.success(
+        f"Loaded graph with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
+    )
+
+    logger.info("Selecting valid word nodes...")
+    valid_nodes = [n for n, attr in G.nodes(data=True) if attr.get("is_valid_word")]
+    G = G.subgraph(valid_nodes)
+    logger.success(
+        f"Filtered graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
+    )
+
+    logger.info("Calculating spring layout...")
+    node_positions = nx.spring_layout(G, seed=42)
+
+    logger.info("Creating Bokeh figure...")
+    p = figure(
+        title=plot_title,
+        x_range=(-1.2, 1.2),
+        y_range=(-1.2, 1.2),
+        x_axis_location=None,
+        y_axis_location=None,
+        width=800,
+        height=800,
+        tools="hover,pan,wheel_zoom,box_zoom,reset",
+        tooltips=[("word", "@word"), ("degree", "@degree")],
+        background_fill_color=None,
+        border_fill_color=None,
+    )
+    p.grid.grid_line_color = None
+
+    logger.info("Creating graph renderer...")
+    graph = from_networkx(G, node_positions, scale=1, center=(0, 0))
+    p.renderers.append(graph)
+
+    # Add node data
+    node_degrees = dict(G.degree())
+    degrees = [node_degrees[node] for node in G.nodes()]
+
+    # Map degrees to colors
+    min_degree = min(degrees)
+    max_degree = max(degrees)
+    node_colors = []
+    for degree in degrees:
+        if max_degree > min_degree:
+            normalized = (degree - min_degree) / (max_degree - min_degree)
+            color_idx = int((1 - normalized) * 255)
+        else:
+            color_idx = 127
+        node_colors.append(Viridis256[color_idx])
+
+    graph.node_renderer.data_source.data["word"] = list(G.nodes())
+    graph.node_renderer.data_source.data["degree"] = degrees
+    graph.node_renderer.data_source.data["colors"] = node_colors
+
+    graph.node_renderer.glyph.update(size=8, fill_color="colors", fill_alpha=0.9)
+    graph.edge_renderer.glyph.update(line_color="#888888", line_alpha=0.1)
+
+    logger.info(f"Saving figure to {output_path}...")
+    save(p, filename=str(output_path), title=plot_title)
+
+    logger.success("Plotting complete.")
+
+
+@app.command()
 def graph_plotly(
-    input_path: Path = INTERIM_DATA_DIR / "graph_en_len_03_valid.pkl",
-    output_path: Path = FIGURES_DIR / "graph_en_len_03_valid.html",
+    input_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
+    output_path: Path = FIGURES_DIR / "graph_en_len03.html",
     plot_title: str = "Word graph for 3-letter English words",
 ):
     """
-    Plot graph using Plotly.
+    Plot a graph using Plotly.
 
     Args:
-        input_path (Path, optional): _description_. Defaults to INTERIM_DATA_DIR/"graph_en_len_03_valid.pkl".
-        output_path (Path, optional): _description_. Defaults to FIGURES_DIR/"graph_en_len_03_valid.png".
+        input_path (Path, optional): _description_. Defaults to INTERIM_DATA_DIR/"graph_en_len03.pkl".
+        output_path (Path, optional): _description_. Defaults to FIGURES_DIR/"graph_en_len03.png".
     """
     logger.info("Loading graph...")
     G = load_graph(input_path)
@@ -228,16 +310,16 @@ def graph_plotly(
 
 @app.command()
 def graph_pyvis(
-    input_path: Path = INTERIM_DATA_DIR / "graph_en_len_03_valid.pkl",
-    output_path: Path = FIGURES_DIR / "graph_en_len_03_valid.html",
+    input_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
+    output_path: Path = FIGURES_DIR / "graph_en_len03.html",
     plot_title: str = "Word graph for 3-letter English words",
 ):
     """
-    Plot graph using pyvis.
+    Plot a graph using pyvis.
 
     Args:
-        input_path (Path, optional): _description_. Defaults to INTERIM_DATA_DIR/"graph_en_len_03_valid.pkl".
-        output_path (Path, optional): _description_. Defaults to FIGURES_DIR/"graph_en_len_03_valid.png".
+        input_path (Path, optional): _description_. Defaults to INTERIM_DATA_DIR/"graph_en_len03.pkl".
+        output_path (Path, optional): _description_. Defaults to FIGURES_DIR/"graph_en_len03.png".
     """
     logger.info("Loading graph...")
     G = load_graph(input_path)
