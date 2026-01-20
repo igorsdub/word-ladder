@@ -48,6 +48,8 @@ def load_graph(
     return G
 
 
+
+
 @app.command()
 def build(
     input_path: Path = INTERIM_DATA_DIR / "en_len03.txt",
@@ -100,6 +102,27 @@ def build(
     logger.info(f"Saving graph to {output_path}...")
     save_graph(G, output_path)
     logger.success("Graph saved successfully.")
+
+
+@app.command()
+def analyze(
+    input_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
+):
+    """
+    Analyze a graph from a pickle file.
+
+    :param input_path: Description
+    :type input_path: Path
+    """
+
+    load_graph(input_path)
+    num_nodes = G.number_of_nodes()
+    num_edges = G.number_of_edges()
+    logger.info(f"Graph has {num_nodes} nodes and {num_edges} edges.")
+
+    # Longest Shortest Path Between Words (Graph Diameter)
+    # Most Needed Intermediate Words (Betweenness Centrality)
+    # Categories or Clusters Among the Words (Community Detection)
 
 
 @app.command()

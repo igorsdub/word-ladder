@@ -18,10 +18,6 @@ An exoloartion of the word ladder game thorugh the graph theory. This game is a 
 │   ├── processed      <- The final, canonical data sets for modeling.
 │   └── raw            <- The original, immutable data dump.
 │
-├── docs               <- A default mkdocs project; see www.mkdocs.org for details
-│
-├── models             <- Trained and serialized models, model predictions, or model summaries
-│
 ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
 │                         the creator's initials, and a short `-` delimited description, e.g.
 │                         `1.0-jqp-initial-data-exploration`.
@@ -31,13 +27,9 @@ An exoloartion of the word ladder game thorugh the graph theory. This game is a 
 │
 ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
 │
+├── figures            <- Generated graphics and figures, PDF, LaTeX, etc.
+│
 ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-│   └── figures        <- Generated graphics and figures to be used in reporting
-│
-├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-│                         generated with `pip freeze > requirements.txt`
-│
-├── setup.cfg          <- Configuration file for flake8
 │
 └── src   <- Source code for use in this project.
     │
@@ -47,12 +39,7 @@ An exoloartion of the word ladder game thorugh the graph theory. This game is a 
     │
     ├── dataset.py              <- Scripts to download or generate data
     │
-    ├── features.py             <- Code to create features for modeling
-    │
-    ├── modeling                
-    │   ├── __init__.py 
-    │   ├── predict.py          <- Code to run model inference with trained models          
-    │   └── train.py            <- Code to train models
+    ├── graph.py             <- Code to create graph
     │
     └── plots.py                <- Code to create visualizations
 ```
@@ -140,6 +127,10 @@ This command generates an interactive plot of the word ladder graph and saves it
 
 Another issue is with NetworkX `spring_layout` function that may produce different layouts on different runs due to its random initialization. Even though `seed=42`, every time a new layout is generated.
 
+## Next Steps
+
+- [ ] Use hashing techniques to assign words and find the distance between them more efficiently. See [here](https://bradfieldcs.com/algos/graphs/word-ladder/) for more details.
+
 ## References
 
 - [Word Ladder Algorithm](https://bradfieldcs.com/algos/graphs/word-ladder/) by Bradfield CS
@@ -152,4 +143,4 @@ Another issue is with NetworkX `spring_layout` function that may produce differe
 - [Newtwork Graphs in Pyhton wiht Plotly](https://plotly.com/python/network-graphs/)
 - [Graph Visualization with Pyvis](https://towardsdatascience.com/making-network-graphs-interactive-with-python-and-pyvis-b754c22c270/)
 - [Visualization Tools for NetworkX](https://florian-huber.github.io/data_science_course/notebooks/26_graph_visualization.html#visualization-tools)
-- - [NetworkX with Bokeh](https://docs.bokeh.org/en/latest/docs/user_guide/topics/graph.html)
+- [NetworkX with Bokeh](https://docs.bokeh.org/en/latest/docs/user_guide/topics/graph.html)
