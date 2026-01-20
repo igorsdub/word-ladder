@@ -1,9 +1,11 @@
 import itertools
 from pathlib import Path
 import pickle
+from typing import Annotated
 
 from loguru import logger
 import networkx as nx
+from rich import print
 from tqdm import tqdm
 import typer
 
@@ -12,13 +14,7 @@ from src.config import INTERIM_DATA_DIR, PROCESSED_DATA_DIR, PROJ_ROOT
 app = typer.Typer()
 
 
-def get_hamming_distance(string1, string2):
-    """Calculate the Hamming distance between two equal-length strings."""
-    if len(string1) != len(string2):
-        raise ValueError("Strings must be of equal length.")
-    return sum(char1 != char2 for char1, char2 in zip(string1, string2))
-
-
+##### Graph ######
 def save_graph(
     G: nx.Graph,
     output_path: Path = PROJ_ROOT / "graph.pkl",
@@ -48,6 +44,48 @@ def load_graph(
     return G
 
 
+def find_hamming_distance(string1, string2):
+    """Find the Hamming distance between two equal-length strings."""
+    if len(string1) != len(string2):
+        raise ValueError("Strings must be of equal length.")
+    return sum(char1 != char2 for char1, char2 in zip(string1, string2))
+
+
+##### Analysis ######
+def find_betweenness_centrality(Graph):
+    """Find and display the 5 most central words by betweenness centrality."""
+    betweenness = nx.betweenness_centrality(Graph)
+    print()
+    print("Most Central Words (Betweenness Centrality):")
+    for node, centrality in sorted(betweenness.items(), key=lambda x: x[1], reverse=True)[:5]:
+        print(f"  {node}: {centrality:.4f}")
+    print()
+
+def find_community(Graph):
+    """Find and display communities using Louvain method."""
+    communities_list = nx.community.louvain_communities(Graph)
+    print()
+    print(f"Found {len(communities_list)} Communities:")
+    for community_id, community in enumerate(communities_list):
+        words = sorted(list(community))
+        print(f"  Community {community_id} ({len(words)} words): {', '.join(words[:5])}")
+    print()
+
+
+def find_diameter(Graph):
+    """Find and display the diameter (longest shortest path) of the graph."""
+    diameter = nx.diameter(Graph)
+    eccentricity = nx.eccentricity(Graph)
+    periphery = nx.periphery(Graph)
+
+    # Find a path between two peripheral nodes
+    node1, node2 = periphery[0], periphery[1]
+    diameter_path = nx.shortest_path(Graph, source=node1, target=node2)
+
+    print()
+    print(f"Graph Diameter: {diameter} steps")
+    print(f"Diameter path: {' - '.join(diameter_path)}")
+    print()
 
 
 @app.command()
@@ -94,7 +132,7 @@ def build(
     valid_word_nodes = [node for node in G.nodes() if G.nodes[node]["is_valid_word"]]
     for i, n1 in tqdm(enumerate(valid_word_nodes), total=len(valid_word_nodes)):
         for j, n2 in enumerate(valid_word_nodes):
-            if i < j and get_hamming_distance(n1, n2) == 1:
+            if i < j and find_hamming_distance(n1, n2) == 1:
                 G.add_edge(n1, n2)
 
     logger.success(f"Graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges.")
@@ -107,22 +145,49 @@ def build(
 @app.command()
 def analyze(
     input_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
+    output_path: Path = PROCESSED_DATA_DIR / "analysis_en_len03.txt",
+    word_length: int = 3,
+    diameter: Annotated[bool, typer.Option(help="Find graph diameter.")] = False,
+    betweenness: Annotated[bool, typer.Option(help="Find graph betweenness.")] = False,
+    community: Annotated[bool, typer.Option(help="Find graph communities.")] = False,
+    aloof: Annotated[bool, typer.Option(help="Include aloof words")] = False,
+    alphabet: str = "abcdefghijklmnopqrstuvwxyz",
 ):
     """
-    Analyze a graph from a pickle file.
+    Analyze a word graph from a pickle file.
 
-    :param input_path: Description
+    Includes betweenness centrality, community detection, and diameter analysis.
+
+    :param input_path: Path to the graph pickle file
     :type input_path: Path
     """
+    logger.info(f"Loading graph from {input_path}...")
+    G = load_graph(input_path)
+    logger.success(f"Graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges.")
 
-    load_graph(input_path)
-    num_nodes = G.number_of_nodes()
-    num_edges = G.number_of_edges()
-    logger.info(f"Graph has {num_nodes} nodes and {num_edges} edges.")
+    if not aloof:
+        logger.info("Excluding aloof (degree=0) words...")
+        no_aloof_nodes = [n for n, d in G.degree() if d > 0]
+        G = G.subgraph(no_aloof_nodes)
+        logger.success(
+            f"Filtered graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
+        )
+    else:
+        logger.info("Including aloof (degree=0) words...")
 
-    # Longest Shortest Path Between Words (Graph Diameter)
-    # Most Needed Intermediate Words (Betweenness Centrality)
-    # Categories or Clusters Among the Words (Community Detection)
+    if betweenness:
+        logger.info("Finding betweenness centrality...")
+        find_betweenness_centrality(G)
+
+    if diameter:
+        logger.info("Finding diameter...")
+        find_diameter(G)
+
+    if community:
+        logger.info("Finding communities...")
+        find_community(G)
+
+    logger.success("Analysis complete.")
 
 
 @app.command()
