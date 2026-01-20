@@ -24,74 +24,6 @@ app = typer.Typer()
 
 
 @app.command()
-def graph_networkx(
-    input_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
-    output_path: Path = FIGURES_DIR / "graph_en_len03_networkx.png",
-    plot_title: str = "3-letter English word graph",
-):
-    """
-    Plot a graph using NetworkX.draw.
-
-    Args:
-        input_path (Path, optional): _description_. Defaults to INTERIM_DATA_DIR/"graph_en_len03.pkl".
-        output_path (Path, optional): _description_. Defaults to FIGURES_DIR/"graph_en_len03.png".
-        plot_title (str, optional): _description_. Defaults to "Word graph for 3-letter English words".
-    """
-    logger.info("Loading graph...")
-    G = load_graph(input_path)
-    logger.success(
-        f"Loaded graph with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
-    )
-
-    logger.info("Selecting valid word nodes...")
-    valid_nodes = [n for n, attr in G.nodes(data=True) if attr.get("is_valid_word")]
-    G = G.subgraph(valid_nodes)
-    logger.success(
-        f"Filtered graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
-    )
-
-    logger.info("Calculating spring layout...")
-    node_positions = nx.spring_layout(G, seed=42)
-
-    logger.info("Creating figure...")
-    fig, ax = plt.subplots(figsize=(5, 5))
-
-    # Draw edges
-    nx.draw_networkx_edges(
-        G,
-        node_positions,
-        ax=ax,
-        width=0.5,
-        edge_color="#888888",
-        alpha=0.1,
-    )
-
-    # Draw nodes with degree-based coloring
-    node_degrees = dict(G.degree())
-    node_colors = [node_degrees[node] for node in G.nodes()]
-
-    nodes = nx.draw_networkx_nodes(
-        G,
-        node_positions,
-        ax=ax,
-        node_color=node_colors,
-        node_size=20,
-        cmap="viridis_r",
-        alpha=0.9,
-    )
-
-    ax.set_title(plot_title, fontsize=16)
-    ax.axis("off")
-    plt.colorbar(nodes, ax=ax, label="Degree", fraction=0.03, pad=0.04)
-
-    logger.info(f"Saving figure to {output_path}...")
-    plt.savefig(output_path, facecolor="white", dpi=300)
-    plt.close()
-
-    logger.success("Plotting complete.")
-
-
-@app.command()
 def graph_bokeh(
     input_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
     output_path: Path = FIGURES_DIR / "graph_en_len03_bokeh.html",
@@ -201,6 +133,74 @@ def graph_bokeh(
 
     logger.info(f"Saving figure to {output_path}...")
     save(p, filename=str(output_path), title=plot_title)
+
+    logger.success("Plotting complete.")
+
+
+@app.command()
+def graph_networkx(
+    input_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
+    output_path: Path = FIGURES_DIR / "graph_en_len03_networkx.png",
+    plot_title: str = "3-letter English word graph",
+):
+    """
+    Plot a graph using NetworkX.draw.
+
+    Args:
+        input_path (Path, optional): _description_. Defaults to INTERIM_DATA_DIR/"graph_en_len03.pkl".
+        output_path (Path, optional): _description_. Defaults to FIGURES_DIR/"graph_en_len03.png".
+        plot_title (str, optional): _description_. Defaults to "Word graph for 3-letter English words".
+    """
+    logger.info("Loading graph...")
+    G = load_graph(input_path)
+    logger.success(
+        f"Loaded graph with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
+    )
+
+    logger.info("Selecting valid word nodes...")
+    valid_nodes = [n for n, attr in G.nodes(data=True) if attr.get("is_valid_word")]
+    G = G.subgraph(valid_nodes)
+    logger.success(
+        f"Filtered graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
+    )
+
+    logger.info("Calculating spring layout...")
+    node_positions = nx.spring_layout(G, seed=42)
+
+    logger.info("Creating figure...")
+    fig, ax = plt.subplots(figsize=(5, 5))
+
+    # Draw edges
+    nx.draw_networkx_edges(
+        G,
+        node_positions,
+        ax=ax,
+        width=0.5,
+        edge_color="#888888",
+        alpha=0.1,
+    )
+
+    # Draw nodes with degree-based coloring
+    node_degrees = dict(G.degree())
+    node_colors = [node_degrees[node] for node in G.nodes()]
+
+    nodes = nx.draw_networkx_nodes(
+        G,
+        node_positions,
+        ax=ax,
+        node_color=node_colors,
+        node_size=20,
+        cmap="viridis_r",
+        alpha=0.9,
+    )
+
+    ax.set_title(plot_title, fontsize=16)
+    ax.axis("off")
+    plt.colorbar(nodes, ax=ax, label="Degree", fraction=0.03, pad=0.04)
+
+    logger.info(f"Saving figure to {output_path}...")
+    plt.savefig(output_path, facecolor="white", dpi=300)
+    plt.close()
 
     logger.success("Plotting complete.")
 
