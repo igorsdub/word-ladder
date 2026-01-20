@@ -15,7 +15,11 @@ typer = "*"
 pip = "*"
 nltk = ">=3.9.2,<4"
 networkx = ">=3.4.2,<4"
+plotly = ">=6.5.2,<7"
+matplotlib = ">=3.10.8,<4"
+scipy = ">=1.15.2,<2"
 
 [pypi-dependencies]
 python-dotenv = "*"
 src = { path = ".", editable = true }
+kaleido = ">=1.2.0, <2"
