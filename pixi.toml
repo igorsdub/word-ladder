@@ -19,6 +19,7 @@ plotly = ">=6.5.2,<7"
 matplotlib = ">=3.10.8,<4"
 scipy = ">=1.15.2,<2"
 pyvis = ">=0.3.2,<0.4"
+bokeh = ">=3.8.1,<4"
 
 [pypi-dependencies]
 python-dotenv = "*"
