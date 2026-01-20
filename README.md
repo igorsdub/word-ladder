@@ -150,3 +150,5 @@ Another issue is with NetworkX `spring_layout` function that may produce differe
 - [Generating Word Ladders Using Adjacency Matrices](https://community.wolfram.com/groups/-/m/t/2928331) by Chase Marangu
 - [Word Ladders with Julia](https://numbersandshapes.net/posts/word_ladders_with_julia/) at Numbers and Shapes blog
 - [Newtwork Graphs in Pyhton wiht Plotly](https://plotly.com/python/network-graphs/)
+- [Graph Visualization with Pyvis](https://towardsdatascience.com/making-network-graphs-interactive-with-python-and-pyvis-b754c22c270/)
+- [Visualization Tools for NetworkX](https://florian-huber.github.io/data_science_course/notebooks/26_graph_visualization.html#visualization-tools) 
