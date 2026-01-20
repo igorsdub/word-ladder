@@ -15,11 +15,6 @@ app = typer.Typer()
 def download(
 ):
     """Download the NLTK words dataset.
-    Downloads `words.zip` to `RAW_DATA_DIR/corpora/` and unzips it to `words/`.
-    The unzipped folder contains:
-        `en` - a list of English words.
-        `en-basic` - a list of basic English words.
-        `README` - a README file describing the corpus.
     """    
     logger.info("Download dataset...")
     nltk.download('words', download_dir=RAW_DATA_DIR)
@@ -32,7 +27,7 @@ def filter(
     proper_nouns: bool = False,
     output_dir: Path = INTERIM_DATA_DIR,
 ):
-    """Filter the NLTK corpora English n-letter lowercase words.
+    """Filter the NLTK English corpora for n-letter lowercase words.
     """    
     logger.info("Load dataset...")
     with open(input_path, "r") as f:
