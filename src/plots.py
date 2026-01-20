@@ -131,6 +131,7 @@ def graph_bokeh(
         background_fill_color=None,
         border_fill_color=None,
     )
+    p.title.text_font_size = "18pt"
     p.grid.grid_line_color = None
 
     logger.info("Creating graph renderer...")
@@ -151,7 +152,7 @@ def graph_bokeh(
     graph.node_renderer.data_source.data["degree"] = degrees
 
     graph.node_renderer.glyph.update(
-        size=8,
+        size=10,
         fill_alpha=0.9,
         fill_color={"field": "degree", "transform": color_mapper},
     )
@@ -166,6 +167,9 @@ def graph_bokeh(
         location=(0, 0),
         title="Degree",
         title_text_align="center",
+        title_text_font_size="14pt",
+        label_standoff=8,
+        margin=8,
     )
     p.add_layout(color_bar, "below")
 
