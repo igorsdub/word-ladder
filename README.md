@@ -116,13 +116,27 @@ To build the graph, run the following command:
 python src/features.py build-graph --word-length 3
 ```
 
-This command uses the English alphabet (a-z) to find all possible one-letter transformations for each word in the filtered dataset. The resulting graph is saved in the `data/interim` directory in `.pickle` format.
+This command uses the English alphabet (a-z) to find all possible one-letter transformations for each word in the filtered dataset. The resulting graph is saved in the `data/interim` directory in Pickle `.pkl` format.
 
-Next, we assign `isValidWord` attribute to each node in the graph. A valid word is defined as a word that exists in the original dataset. The, we conncet nodes with `isValidWord=True` if they differ by one letter.
+Next, we assign `is_valid_word` attribute to each node in the graph. A valid word is defined as a word that exists in the original dataset. The, we conncet nodes with `is_valid_word=True` if they differ by one letter.
 
 ```bash
 python src/features.py assign-valid-words --word-length 3
 ```
+
+### Plot
+
+Let's visualize the graph to see the connections between words. We will use Plotly to create a visual representation of the graph.
+
+```bash
+python src/plots.py plot-graph
+```
+
+This command generates an interactive plot of the word ladder graph and saves it as an HTML file in the `reports/figures` directory.
+
+#### Issue with Plotly
+
+"new text' label appears at the center of the plot. This StackOverflow [thread](https://stackoverflow.com/questions/70792555/plotly-network-graph-new-text-label-appears-at-center-of-plot) discusses this issue.
 
 ## References
 
@@ -133,3 +147,4 @@ python src/features.py assign-valid-words --word-length 3
 - [New Word Ladder Game Bot with Scoring Based on Graphs](https://community.wolfram.com/groups/-/m/t/908570) by Irina Tirosyan
 - [Generating Word Ladders Using Adjacency Matrices](https://community.wolfram.com/groups/-/m/t/2928331) by Chase Marangu
 - [Word Ladders with Julia](https://numbersandshapes.net/posts/word_ladders_with_julia/) at Numbers and Shapes blog
+- [Newtwork Graphs in Pyhton wiht Plotly](https://plotly.com/python/network-graphs/)
