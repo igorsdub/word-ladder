@@ -134,9 +134,11 @@ python src/plots.py plot-graph
 
 This command generates an interactive plot of the word ladder graph and saves it as an HTML file in the `reports/figures` directory.
 
-#### Issue with Plotly
+#### Issues
 
 "new text' label appears at the center of the plot. This StackOverflow [thread](https://stackoverflow.com/questions/70792555/plotly-network-graph-new-text-label-appears-at-center-of-plot) discusses this issue.
+
+Another issue is with NetworkX `spring_layout` function that may produce different layouts on different runs due to its random initialization. Even though `seed=42`, every time a new layout is generated.
 
 ## References
 
