@@ -50,88 +50,57 @@ def load_graph(
 
 @app.command()
 def build_graph(
-    output_path: Path = INTERIM_DATA_DIR / "graph_en_len03_empty.pkl",
+    input_path: Path = INTERIM_DATA_DIR / "en_len03.txt",
+    output_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
     word_length: int = 3,
     alphabet: str = "abcdefghijklmnopqrstuvwxyz",
-    connect: bool = False,
 ):
     """
-    Build a word graph of given word length and alphabet without edges.
+    Build a word graph with valid words and connect them by Hamming distance.
 
-    :param output_dir: Description
-    :type output_dir: Path
-    :param word_length: Description
+    :param input_path: Path to file with valid words
+    :type input_path: Path
+    :param output_path: Path to save the graph
+    :type output_path: Path
+    :param word_length: Length of words
     :type word_length: int
+    :param alphabet: Alphabet to use for generating all possible words
+    :type alphabet: str
     """
-
     alphabet = list(alphabet)
 
     logger.info("Constructing all possible words...")
     nodes = ["".join(p) for p in itertools.product(alphabet, repeat=word_length)]
     logger.success(
-        f"Constructed {len(nodes)} words of length {word_length} and alhabet size {len(alphabet)}."
+        f"Constructed {len(nodes)} words of length {word_length} and alphabet size {len(alphabet)}."
     )
 
-    logger.info("Intializing word graph...")
+    logger.info(f"Loading valid words from {input_path}...")
+    with open(input_path, "r", encoding="utf-8") as file:
+        valid_words = set(file.read().splitlines())
+    logger.success(f"Loaded {len(valid_words)} valid words.")
+
+    logger.info("Initializing word graph...")
     G = nx.Graph()
     G.add_nodes_from(nodes)
 
-    if connect:
-        logger.info("Adding edges to word graph...")
-        for i, node1 in tqdm(enumerate(nodes), total=len(nodes)):
-            for j, node2 in enumerate(nodes):
-                if i < j and get_hamming_distance(node1, node2) == 1:
-                    G.add_edge(node1, node2)
+    logger.info("Assigning valid word attributes to nodes...")
+    for node in G.nodes():
+        G.nodes[node]["is_valid_word"] = node in valid_words
 
-    logger.info(f"Graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges.")
+    logger.info("Connecting valid words by Hamming distance...")
+    valid_word_nodes = [node for node in G.nodes() if G.nodes[node]["is_valid_word"]]
+    for i, n1 in tqdm(enumerate(valid_word_nodes), total=len(valid_word_nodes)):
+        for j, n2 in enumerate(valid_word_nodes):
+            if i < j and get_hamming_distance(n1, n2) == 1:
+                G.add_edge(n1, n2)
+
+    logger.success(f"Graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges.")
 
     logger.info(f"Saving graph to {output_path}...")
     save_graph(G, output_path)
     logger.success("Graph saved successfully.")
 
-@app.command()
-def assign_words(
-    graph_input_path: Path = INTERIM_DATA_DIR / "graph_en_len03_empty.pkl",
-    words_input_path: Path = INTERIM_DATA_DIR / "en_len03.txt",
-    output_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
-):
-    """
-    Assign valid words to the nodes of the word graph.
-    
-    :param graph_input_path: Description
-    :type graph_input_path: Path
-    :param words_input_path: Description
-    :type words_input_path: Path
-    :param output_path: Description
-    :type output_path: Path
-    """
-    logger.info(f"Loading graph from {graph_input_path}...")
-    G = pickle.load(open(graph_input_path, "rb"))
-    logger.success(f"Graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges.")
-
-    logger.info(f"Loading words from {words_input_path}...")
-    with open(words_input_path, "r", encoding="utf-8") as file:
-        valid_words = set(file.read().splitlines())
-    logger.success(f"Loaded {len(valid_words)} words.")
-
-    logger.info("Assigning words to the graph nodes...")
-    for node in G.nodes():
-        G.nodes[node]['is_valid_word'] = node in valid_words
-
-    logger.info("Connecting valid words...")
-    # Select only nodes that are valid words. Non-valid words are not connected.
-    valid_word_nodes = [node for node in G.nodes() if G.nodes[node]['is_valid_word']]
-    for i, n1 in tqdm(enumerate(valid_word_nodes), total=len(valid_word_nodes)):
-        for j, n2 in enumerate(valid_word_nodes):
-            if i < j:
-                if G.nodes[n1]['is_valid_word'] and G.nodes[n2]['is_valid_word']:
-                    if get_hamming_distance(n1, n2) == 1:
-                        G.add_edge(n1, n2)
-    logger.success(f"Graph now has {G.number_of_edges()} edges among valid words.")
-
-    logger.info(f"Saving updated graph to {output_path}...")
-    pickle.dump(G, open(output_path, "wb"))
-    logger.success("Updated graph saved successfully.")
 
 @app.command()
 def main(
