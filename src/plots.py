@@ -27,6 +27,7 @@ app = typer.Typer()
 def graph_bokeh(
     input_path: Path = INTERIM_DATA_DIR / "graph_en_len03.pkl",
     output_path: Path = FIGURES_DIR / "graph_en_len03_bokeh.html",
+    aloof: bool = False,
     plot_title: str = "3-letter English word graph",
 ):
     """
@@ -35,6 +36,7 @@ def graph_bokeh(
     Args:
         input_path (Path, optional): _description_. Defaults to INTERIM_DATA_DIR/"graph_en_len03.pkl".
         output_path (Path, optional): _description_. Defaults to FIGURES_DIR/"graph_en_len03_bokeh.html".
+        aloof (bool, optional): Include aloof words, degree=0. Defaults to False.
         plot_title (str, optional): _description_. Defaults to "3-letter English word graph".
     """
     logger.info("Loading graph...")
@@ -43,12 +45,15 @@ def graph_bokeh(
         f"Loaded graph with {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
     )
 
-    logger.info("Selecting valid word nodes...")
-    valid_nodes = [n for n, attr in G.nodes(data=True) if attr.get("is_valid_word")]
-    G = G.subgraph(valid_nodes)
-    logger.success(
-        f"Filtered graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
-    )
+    if not aloof:
+        logger.info("Excluding aloof (degree=0) words...")
+        no_aloof_nodes = [n for n, d in G.degree() if d > 0]
+        G = G.subgraph(no_aloof_nodes)
+        logger.success(
+            f"Filtered graph has {G.number_of_nodes()} nodes and {G.number_of_edges()} edges."
+        )
+    else:
+        logger.info("Including aloof (degree=0) words...")
 
     logger.info("Calculating spring layout...")
     node_positions = nx.spring_layout(G, seed=42)
