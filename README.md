@@ -130,6 +130,7 @@ Another issue is with NetworkX `spring_layout` function that may produce differe
 ## Next Steps
 
 - [ ] Use hashing techniques to assign words and find the distance between them more efficiently. See [here](https://bradfieldcs.com/algos/graphs/word-ladder/) for more details.
+- [ ] Implement cuGraph for GPU acceleration. Only works with NVIDIA GPUs on Linux systems.
 
 ## References
 
